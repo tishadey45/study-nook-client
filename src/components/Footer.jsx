@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import footer from "@/assets/footer.png";
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 
 import { FaXTwitter } from "react-icons/fa6";
@@ -10,9 +11,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
         <div>
           <Link href="/">
-            <Image src={logo} alt="logo" width={120} height={100}></Image>
+            <Image src={footer} alt="footer" width={200} height={200}></Image>
           </Link>
-          <p className="text-sm leading-6 text-gray-400">
+          <p className="text-sm  text-gray-400 mb-10">
             A modern platform for booking quiet and comfortable study rooms
             easily anytime, anywhere.
           </p>
