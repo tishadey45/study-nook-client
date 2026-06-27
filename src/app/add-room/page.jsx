@@ -3,7 +3,9 @@
 
 import { authClient } from "@/lib/auth-client";
 import { addStudyRoom } from "@/services/studyRoomApi";
+
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -26,6 +28,8 @@ export default function AddStudyRoomForm() {
   } = useForm();
 
   const imageFile = watch("image");
+
+  const router = useRouter();
 
   const onSubmit = async (data) => {
     // console.log("data", data);
@@ -64,6 +68,7 @@ export default function AddStudyRoomForm() {
 
       toast.success("Study Room Added Successfully");
       reset();
+      router.push("/all-rooms");
     } catch (error) {
       console.log(error);
       toast.error("Failed to add room");
