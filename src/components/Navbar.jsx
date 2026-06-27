@@ -37,7 +37,7 @@ export default function Navbar() {
             </Link>
           </li>
           <li>
-            <Link href="/rooms" className="text-blue-600 font-bold">
+            <Link href="/all-rooms" className="text-blue-600 font-bold">
               Rooms
             </Link>
           </li>
