@@ -1,12 +1,14 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
-import { getMyListings } from "@/services/studyRoomApi";
+import { deleteRoom, getMyListings } from "@/services/studyRoomApi";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
+
 
 export default function MyListingsPage() {
   const session = authClient.useSession();
@@ -33,26 +35,49 @@ export default function MyListingsPage() {
     fetchRooms();
   }, [user]);
 
-//   const handleDelete = async (id) => {
-//     const confirmDelete = window.confirm(
-//       "Are you sure you want to delete this room?"
-//     );
+ const handleUpdate = (id) => {
+    // Navigate to the update page with the room ID
+    window.location.href = `/update-room/${id}`;
+  } 
 
-//     if (!confirmDelete) return;
+ const handleDelete = async (id) => {
+  const result = await Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to recover this room!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#2563eb",
+    cancelButtonColor: "#ef4444",
+    confirmButtonText: "Yes, Delete",
+    cancelButtonText: "Cancel",
+  });
 
-//     try {
-//       const result = await deleteRoom(id);
+  if (!result.isConfirmed) return;
 
-//       if (result.deletedCount > 0) {
-//         toast.success("Room deleted successfully");
+  try {
+    const response = await deleteRoom(id);
 
-//         setRooms((prev) => prev.filter((room) => room._id !== id));
-//       }
-//     } catch (error) {
-//       console.log(error);
-//       toast.error("Failed to delete room");
-//     }
-//   };
+    if (response.deletedCount > 0) {
+      Swal.fire({
+        title: "Deleted!",
+        text: "Study room has been deleted successfully.",
+        icon: "success",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+
+      setRooms((prev) => prev.filter((room) => room._id !== id));
+    }
+  } catch (error) {
+    console.log(error);
+
+    Swal.fire({
+      title: "Error!",
+      text: "Failed to delete room.",
+      icon: "error",
+    });
+  }
+};
 
   if (loading) {
     return (
@@ -151,7 +176,7 @@ export default function MyListingsPage() {
                         </Link>
 
                         <button
-                        //   onClick={() => handleDelete(room._id)}
+                          onClick={() => handleDelete(room._id)}
                           className="btn btn-sm btn-error text-white"
                         >
                           <FaTrash />

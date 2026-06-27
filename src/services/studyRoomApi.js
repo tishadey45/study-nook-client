@@ -21,7 +21,12 @@ export const getMyListings = async (email) => {
   return data;
 };
 
+export const updateRoom = async (id, updatedData) => {
+  const { data } = await axiosSecure.put(`/api/rooms/${id}`, updatedData);
+  return data;
+}
+
 export const deleteRoom = async (id) => {
-  const { data } = await axiosSecure.delete(`/rooms/${id}`);
+  const { data } = await axiosSecure.delete(`/api/rooms/${id}`);
   return data;
 };
