@@ -1,9 +1,12 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { FcGoogle } from "react-icons/fc";
+import { authClient } from "@/lib/auth-client";
+import Link from "next/link";
 import { useState } from "react";
-
+import { useForm } from "react-hook-form";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
 
 export default function LoginPage() {
   const {
@@ -12,100 +15,185 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm();
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+
   const onSubmit = async (userData) => {
-    console.log(userData);
-    const {data,error}= await authClient.signIn.email({
+    setError("");
+
+    const { data, error } = await authClient.signIn.email({
       email: userData.email,
       password: userData.password,
       rememberMe: true,
-      callbackUrl:"/"
-    })
+      callbackUrl: "/",
+    });
+
+    if (error) {
+      setError(error.message || "Invalid email or password");
+    }
+
+    console.log(data);
   };
-    const [error, setError] = useState("");
 
-    const handleLogin = async (e) => {a
-      e.preventDefault();
+  const handleGoogleSignIn = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+    });
+  };
 
-      setError("");
-
-      const form = e.target;
-
-      const email = form.email.value;
-      const password = form.password.value;
-
-      try {
-        toast.success("Login successful!");
-      } catch (err) {
-        setError("Invalid email or password");
-        toast.error("Invalid email or password");
-      }
-    };
-
-    const handleGoogleLogin = async () => {
-      try {
-        toast.success("Google login successful!");
-      } catch (err) {
-        toast.error("Google login failed");
-      }
-    };
+  const handleGithubSignIn = async () => {
+    await authClient.signIn.social({
+      provider: "github",
+    });
+  };
 
   return (
-    <div className="">
-      <div className="min-h-screen flex items-center justify-center bg-base-200 px-4">
-        <div className="w-full max-w-md bg-base-100 shadow-2xl rounded-2xl p-8">
-          <h2 className="text-3xl font-bold text-center mb-2">Welcome Back</h2>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-xl bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
 
-          <p className="text-center text-gray-500 mb-6">
-            Login to your account
+        {/* Header */}
+        <div className="text-center px-10 pt-10 pb-8">
+          <h1 className="text-3xl font-bold text-gray-800">
+            Welcome Back 👋
+          </h1>
+
+          <p className="text-gray-500 mt-2">
+            Login to continue using StudyNook.
           </p>
+        </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div>
-              <label className="label">
-                <span className="label-text font-medium">Email</span>
-              </label>
+        {/* Form */}
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="px-10 pb-10 space-y-5"
+        >
+          {/* Email */}
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Email Address
+            </label>
+
+            <div className="relative">
+              <Mail
+                size={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              />
 
               <input
                 type="email"
-                name="email"
                 placeholder="Enter your email"
-                className="input input-bordered w-full"
-                required
+                className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition"
+                {...register("email", {
+                  required: "Email is required",
+                })}
               />
             </div>
-            <div>
-              <label className="label">
-                <span className="label-text font-medium">Password</span>
-              </label>
+
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Password
+            </label>
+
+            <div className="relative">
+              <Lock
+                size={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              />
 
               <input
-                type="password"
-                name="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
-                className="input input-bordered w-full"
-                required
+                className="w-full pl-12 pr-12 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition"
+                {...register("password", {
+                  required: "Password is required",
+                })}
               />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
             </div>
-            {error && (
-              <p className="text-red-500 text-sm font-medium">{error}</p>
+
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.password.message}
+              </p>
             )}
-            <button className="btn btn-primary w-full">Login</button>
-          </form>
-          <div className="divider my-6">OR</div>
+          </div>
+
+          {/* Error */}
+          {error && (
+            <p className="text-red-500 text-sm font-medium">{error}</p>
+          )}
+
+          {/* Forgot Password */}
+          <div className="flex justify-end">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Forgot Password?
+            </Link>
+          </div>
+
+          {/* Login Button */}
           <button
-            onClick={handleGoogleLogin}
-            className="btn btn-outline w-full"
+            type="submit"
+            className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
           >
-            <FcGoogle size={22} />
+            Login
+          </button>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-gray-300"></div>
+            <span className="text-gray-500 text-sm">OR</span>
+            <div className="flex-1 h-px bg-gray-300"></div>
+          </div>
+
+          {/* Google */}
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            className="w-full py-3 rounded-xl border border-gray-300 hover:bg-gray-100 transition flex items-center justify-center gap-3"
+          >
+            <FcGoogle size={24} />
             Continue with Google
           </button>
-          <p className="text-center text-sm mt-6">
-            Don’t have an account?{" "}
-            <span className="text-primary font-semibold cursor-pointer">
+
+          {/* GitHub */}
+          <button
+            type="button"
+            onClick={handleGithubSignIn}
+            className="w-full py-3 rounded-xl border border-gray-300 hover:bg-gray-100 transition flex items-center justify-center gap-3"
+          >
+            <FaGithub size={22} />
+            Continue with GitHub
+          </button>
+
+          {/* Register */}
+          <p className="text-center text-sm text-gray-600">
+            Don&apos;t have an account?
+            <Link
+              href="/register"
+              className="ml-1 font-semibold text-blue-600 hover:underline"
+            >
               Register
-            </span>
+            </Link>
           </p>
-        </div>
+        </form>
       </div>
     </div>
   );
