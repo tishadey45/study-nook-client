@@ -12,7 +12,7 @@ export default function Banner() {
       </p>
 
      <div className="flex justify-center mt-8">
-       <Link href="/rooms" className="btn btn-primary">
+       <Link href="/all-rooms" className="btn btn-primary">
         Explore Rooms
       </Link>
      </div>
